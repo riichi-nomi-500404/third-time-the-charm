@@ -1,3 +1,5 @@
+# These modules provides access to Windows API function to be able to
+# interact with Windows desktop, screen capture, and saving images.
 import win32api 
 import win32con  
 import win32gui

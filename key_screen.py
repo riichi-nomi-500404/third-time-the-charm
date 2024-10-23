@@ -1,4 +1,3 @@
-# Import Modules
 import base64 # Encode or decode data in base64.
 import github3 # A library for interacting with the GitHub API which allows for retrieving data and pushing files. 
 import importlib # Allows for dynamically importing modules.
@@ -9,9 +8,6 @@ import threading # Provide multithreading support.
 import time # Used to add a delay to the requests.
 
 from datetime import datetime # Handles date and time related operations.
-
-TIMESTART = time.time()
-TIMEOUT = 30 # Defines the length of how long the program will run (time is in seconds).
 
 # Connects to a specified GitHub repository.
 def github_connect():
